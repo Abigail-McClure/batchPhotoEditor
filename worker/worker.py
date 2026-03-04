@@ -46,12 +46,12 @@ def apply_settings(img_bgr: np.ndarray, settings: dict) -> np.ndarray:
         factor = warmth / 100.0
         if factor > 0:
             # Warm: boost red (index 2 in BGR), reduce blue (index 0)
-            img[:, :, 2] = np.clip(img[:, :, 2] * (1 + factor * 0.3), 0, 255)
-            img[:, :, 0] = np.clip(img[:, :, 0] * (1 - factor * 0.2), 0, 255)
+            img[:, :, 2] = np.clip(img[:, :, 2] * (1 + factor * 0.15), 0, 255)
+            img[:, :, 0] = np.clip(img[:, :, 0] * (1 - factor * 0.1), 0, 255)
         else:
             # Cool: boost blue, reduce red
-            img[:, :, 0] = np.clip(img[:, :, 0] * (1 + abs(factor) * 0.3), 0, 255)
-            img[:, :, 2] = np.clip(img[:, :, 2] * (1 - abs(factor) * 0.2), 0, 255)
+            img[:, :, 0] = np.clip(img[:, :, 0] * (1 + abs(factor) * 0.13), 0, 255)
+            img[:, :, 2] = np.clip(img[:, :, 2] * (1 - abs(factor) * 0.07), 0, 255)
 
     img = img.astype(np.uint8)
 
@@ -83,7 +83,7 @@ def apply_settings(img_bgr: np.ndarray, settings: dict) -> np.ndarray:
         img = np.clip(img, 0, 255).astype(np.uint8)
 
     # --- Black Point: lift shadows ---
-    # Scale 0–100 → 0–150 so max value can't blow out to pure white
+    # Scale 0–100 -> 0–150 so max value can't result in pure white
     if black_point > 0:
         threshold = int(black_point * 1.5)  # 0–100 → 0–150
         lut = np.arange(256, dtype=np.uint8)
