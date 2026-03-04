@@ -4,7 +4,7 @@ Upload one photo, dial in your edits, lock it as a template, then upload more, e
 
 ## Motivation
 
-I take a lot of photos and often end up with a set from the same shoot that all need the same adjustments: same lighting fix, same warmth, same style. Doing that one by one in any editor is tedious. I wanted something minimal: dial in the look on one photo, hit apply, choose more photos, done.
+I take a lot of photos and often end up with a set from the same shoot that all need the same adjustments: same lighting fix, same warmth, same style. Doing that one by one in any editor is tedious. I wanted something minimal: edit the desired look on one photo, hit apply, choose more photos, done.
 
 ## How it works
 
@@ -32,7 +32,7 @@ I take a lot of photos and often end up with a set from the same shoot that all 
 | Warmth | −100 – 100 | 0 | Shifts R/B channels |
 | Hue | 0 – 360 | 0 | Degrees |
 | Tint | −180 – 180 | 0 | Negative = green, positive = magenta |
-| Black Point | 0 – 100 | 0 | Lifts shadows via LUT |
+| Black Point | 0 – 100 | 0 | Lifts shadows via Look-up Table |
 
 ## Architecture
 
@@ -64,7 +64,7 @@ final = { ...batch.edit_settings, ...image.image_override_settings }
 
 ### Live preview vs. worker parity
 
-The browser preview uses CSS `filter` + a tint overlay `<div>`. The Python worker replicates the same math in OpenCV. Warmth, tint, and black point are particularly tricky to match:
+The browser preview uses CSS `filter` and a tint overlay div. The Python worker replicates the same math in OpenCV. Warmth, tint, and black point are particularly tricky to match:
 
 - **Warmth** — R/B channel multiplication (no easy CSS filter equivalent exists; the preview approximates with `sepia` and `hue-rotate`)
 - **Tint** — CSS uses an RGBA overlay div; Python blends against a magenta/green flat color
@@ -115,7 +115,7 @@ supabase/
 1. Create a new project at [supabase.com](https://supabase.com)
 2. Run `supabase/schema.sql` in the SQL editor
 3. Create two **public** storage buckets: `originals` and `edited`
-4. Copy your project URL and API keys from **Settings → API**
+4. Copy your project URL and API keys from **Settings -> API**
 
 ### 2. Frontend environment
 
@@ -142,9 +142,9 @@ SUPABASE_URL=https://<your-project>.supabase.co
 SUPABASE_SERVICE_KEY=<your-service-role-key>
 ```
 
-> Use the **service role** key here (not the anon key) — the worker bypasses RLS to update image rows.
+> Use the **service role** key here (not the anon key); the worker bypasses RLS to update image rows.
 
-Install dependencies and start the worker:
+Install dependencies and start the pythonworker:
 
 ```bash
 cd worker
@@ -208,13 +208,13 @@ The edit preview uses CSS `filter` on an `<img>` tag rather than canvas.
 
 **Why:** Zero latency (GPU-accelerated, no JS computation). Brightness, contrast, saturate, and hue-rotate map directly to CSS filter functions.
 
-**Tradeoff:** Warmth, tint, and black point cannot be expressed precisely in CSS — they are approximated (warmth via `sepia()`, tint via a color overlay `<div>`, black point via a brightness bump). The Python worker applies mathematically correct versions via OpenCV regardless. Preview is approximate; output is accurate.
+**Tradeoff:** Warmth, tint, and black point cannot be expressed precisely in CSS — they are approximated (warmth via `sepia()`, tint via a color overlay `<div>`, black point via a brightness increase). The Python worker applies mathematically correct versions via OpenCV regardless. Preview is approximate; output is accurate.
 
 ---
 
 ### Image processing: OpenCV over Pillow
 
-The worker uses OpenCV + NumPy instead of Pillow.
+The worker uses OpenCV and NumPy instead of Pillow.
 
 **Why:** Hue rotation is first-class in OpenCV — convert to HSV, shift the H channel as a NumPy array, convert back. Fully vectorized, runs in C++. Pillow has no native HSV support; hue rotation would require a slow per-pixel Python loop (`colorsys`) or custom NumPy HSV math.
 
@@ -236,7 +236,7 @@ The worker uses OpenCV + NumPy instead of Pillow.
 
 The ZIP is assembled in the browser using JSZip rather than a server-side API route.
 
-**Why:** Edited images are already public Storage URLs — no need to proxy them through a server. Avoids a backend route that would need to handle large binary payloads.
+**Why:** Edited images are already public Storage URLs, so there is no need to proxy them through a server. Avoids a backend route that would need to handle large payloads.
 
 ---
 
@@ -244,9 +244,9 @@ The ZIP is assembled in the browser using JSZip rather than a server-side API ro
 
 No registration required. Supabase anonymous sign-ins give each browser session a unique `auth.uid()`. RLS policies isolate `batches` and `images` per user.
 
-**Tradeoffs:** Session is tied to browser cookies — clearing cookies loses access to the batch. Storage URLs are public: anyone who guesses the URL can view an image (acceptable for non-sensitive creative work).
+**Tradeoffs:** Session is tied to browser cookies, clearing cookies loses access to the batch. Storage URLs are public: anyone who guesses the URL can view an image (acceptable for non-sensitive creative work).
 
-**Migration path:** Supabase supports converting anonymous sessions to full accounts if login is added later.
+**Migration path:** Supabase supports converting anonymous sessions to full accounts if I decide login should be added later.
 
 ---
 
@@ -254,7 +254,7 @@ No registration required. Supabase anonymous sign-ins give each browser session 
 
 The worker uses the Supabase service role key, which bypasses RLS, because it is a trusted backend process that needs to read and write image rows regardless of which user owns them.
 
-The service role key must never be in `.env.local` or committed to git. It lives only in the worker's environment.
+The service role key should never be in `.env.local` or committed to git. It lives only in the worker's environment, and make sure to put the file with that env variable in .gitignore.
 
 ---
 
@@ -281,6 +281,6 @@ The two processes never talk to each other directly. Supabase is the middleman.
 
 **Upload before insert, not insert before upload.** Creating a DB row with `status = pending` before the file upload completes is a race condition — the worker can pick up the row before `original_url` is set. Fix: generate the UUID client-side with `crypto.randomUUID()`, upload first, then insert the fully-populated row in one step.
 
-**"Public" bucket ≠ writable.** A public Supabase Storage bucket only controls read access by default. Writes still require an explicit INSERT policy on `storage.objects`.
+**"Public" bucket != writable.** A public Supabase Storage bucket only controls read access by default. Writes still require an explicit INSERT policy on `storage.objects`.
 
 **Anonymous sign-in must be explicitly enabled.** In Supabase it is off by default. Enable it under Authentication -> Sign In / Providers -> Anonymous. Without it, `signInAnonymously()` fails and all subsequent DB/storage calls are rejected by RLS.
