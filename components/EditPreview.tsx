@@ -27,7 +27,7 @@ export function EditPreview({ imageUrl, settings }: EditPreviewProps) {
               position: 'absolute',
               inset: 0,
               backgroundColor: tintColor,
-              mixBlendMode: 'color',
+              mixBlendMode: 'normal',
               borderRadius: '0.75rem',
               pointerEvents: 'none',
             }}

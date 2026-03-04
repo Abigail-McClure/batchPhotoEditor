@@ -18,7 +18,7 @@ create table public.images (
   created_at              timestamptz not null default now()
 );
 
--- Indexes for worker polling (hot path)
+-- Indexes for worker polling
 create index idx_images_status   on public.images(status);
 create index idx_images_batch_id on public.images(batch_id);
 
@@ -77,17 +77,3 @@ create policy "Users can update images for their batches"
     )
   );
 
-
--- STORAGE BUCKETS
--- Run these or create buckets manually in dashboard
-
--- insert into storage.buckets (id, name, public) values ('originals', 'originals', true);
--- insert into storage.buckets (id, name, public) values ('edited', 'edited', true);
-
--- Storage RLS: users can upload to their own folder
--- create policy "Users upload own originals"
---   on storage.objects for insert
---   with check (
---     bucket_id = 'originals'
---     and auth.uid()::text = (string_to_array(name, '/'))[1]
---   );

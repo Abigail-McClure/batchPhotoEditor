@@ -5,8 +5,8 @@ export function buildFilterString(s: EditSettings): string {
   const warmthSepia = s.warmth > 0 ? (s.warmth / 100) * 0.4 : 0
   const warmthHue = s.warmth < 0 ? (s.warmth / 100) * 30 : 0
 
-  // Black point: compresses shadows upward, darkening the image slightly
-  const bpBrightness = 1 - (s.blackPoint / 100) * 0.3
+  // Black point: lifts shadows, slight brightness increase (matches Python direction)
+  const bpBrightness = 1 + (s.blackPoint / 100) * 0.15
 
   return [
     `brightness(${(s.brightness * bpBrightness).toFixed(3)})`,

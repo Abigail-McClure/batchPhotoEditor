@@ -27,7 +27,7 @@ export function ImageCard({ image, batchId }: ImageCardProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="relative rounded-xl overflow-hidden bg-gray-50 aspect-square">
+      <div className="relative rounded-lg overflow-hidden bg-gray-50 aspect-square">
         <img
           src={displayUrl}
           alt="Photo"
@@ -37,7 +37,7 @@ export function ImageCard({ image, batchId }: ImageCardProps) {
 
         {/* Spinner overlay: stays up until worker is done AND image is fully rendered */}
         {showOverlay && !isFailed && (
-          <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-xl">
+          <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-lg">
             <div className="flex flex-col items-center gap-2">
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               {isPending && (
@@ -50,7 +50,7 @@ export function ImageCard({ image, batchId }: ImageCardProps) {
         )}
 
         {isFailed && (
-          <div className="absolute inset-0 bg-red-900/40 flex items-center justify-center rounded-xl">
+          <div className="absolute inset-0 bg-red-900/40 flex items-center justify-center rounded-lg">
             <span className="text-white text-xs text-center px-2">Failed</span>
           </div>
         )}

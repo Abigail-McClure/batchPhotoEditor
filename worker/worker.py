@@ -83,8 +83,9 @@ def apply_settings(img_bgr: np.ndarray, settings: dict) -> np.ndarray:
         img = np.clip(img, 0, 255).astype(np.uint8)
 
     # --- Black Point: lift shadows ---
+    # Scale 0–100 → 0–150 so max value can't blow out to pure white
     if black_point > 0:
-        threshold = int(black_point * 2.55)  # 0–100 → 0–255
+        threshold = int(black_point * 1.5)  # 0–100 → 0–150
         lut = np.arange(256, dtype=np.uint8)
         lut[:threshold] = threshold
         img = cv2.LUT(img, lut)
