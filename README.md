@@ -2,6 +2,10 @@
 
 Upload one photo, dial in your edits, lock it in as a template, then upload more, edits apply automatically to every image in the batch.
 
+[Website](https://batch-photo-editor-vert.vercel.app)
+
+![Edit interface](Edit-image.png)
+
 ## Motivation
 
 I take a lot of photos and often end up with a set from the same shoot that all need the same adjustments: same lighting fix, same warmth, same style. Doing that one by one in any editor is tedious. I wanted something minimal: edit the desired look on one photo, hit apply, choose more photos, done.
