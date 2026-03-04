@@ -6,9 +6,10 @@ import { ImageRow } from '@/types'
 interface ResultsGridProps {
   images: ImageRow[]
   batchId: string
+  onRemove: (imageId: string) => void
 }
 
-export function ResultsGrid({ images, batchId }: ResultsGridProps) {
+export function ResultsGrid({ images, batchId, onRemove }: ResultsGridProps) {
   if (images.length === 0) {
     return (
       <p className="text-gray-400 text-sm text-center py-12">
@@ -20,7 +21,7 @@ export function ResultsGrid({ images, batchId }: ResultsGridProps) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
       {images.map((image) => (
-        <ImageCard key={image.id} image={image} batchId={batchId} />
+        <ImageCard key={image.id} image={image} batchId={batchId} onRemove={onRemove} />
       ))}
     </div>
   )

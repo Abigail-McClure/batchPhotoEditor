@@ -7,9 +7,10 @@ interface ThreeDotMenuProps {
   imageId: string
   batchId: string
   originalUrl: string
+  onRemove: () => void
 }
 
-export function ThreeDotMenu({ imageId, batchId, originalUrl }: ThreeDotMenuProps) {
+export function ThreeDotMenu({ imageId, batchId, originalUrl, onRemove }: ThreeDotMenuProps) {
   const [open, setOpen] = useState(false)
   const [showOriginal, setShowOriginal] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -52,6 +53,12 @@ export function ThreeDotMenu({ imageId, batchId, originalUrl }: ThreeDotMenuProp
               className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
             >
               Adjust edits
+            </button>
+            <button
+              onClick={() => { setOpen(false); onRemove() }}
+              className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-gray-50 transition-colors"
+            >
+              Remove image
             </button>
           </div>
         )}

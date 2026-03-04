@@ -7,9 +7,10 @@ import { ImageRow } from '@/types'
 interface ImageCardProps {
   image: ImageRow
   batchId: string
+  onRemove: (imageId: string) => void
 }
 
-export function ImageCard({ image, batchId }: ImageCardProps) {
+export function ImageCard({ image, batchId, onRemove }: ImageCardProps) {
   const displayUrl = image.edited_url || image.original_url
 
   const isPending = image.status === 'pending' || image.status === 'processing'
@@ -61,6 +62,7 @@ export function ImageCard({ image, batchId }: ImageCardProps) {
             imageId={image.id}
             batchId={batchId}
             originalUrl={image.original_url}
+            onRemove={() => onRemove(image.id)}
           />
         </div>
       </div>

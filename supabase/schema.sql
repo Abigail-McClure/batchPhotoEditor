@@ -77,3 +77,12 @@ create policy "Users can update images for their batches"
     )
   );
 
+create policy "Users can delete images for their batches"
+  on public.images for delete
+  using (
+    exists (
+      select 1 from public.batches
+      where id = batch_id and user_id = auth.uid()
+    )
+  );
+

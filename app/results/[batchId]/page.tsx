@@ -69,6 +69,7 @@ export default function ResultsPage({ params }: PageProps) {
           const imageId = crypto.randomUUID()
           const ext = file.name.split('.').pop() ?? 'jpg'
           const path = `${user.id}/${batchId}/${imageId}.${ext}`
+          // Upload to originals storage bucket
           const publicUrl = await uploadToStorage('originals', path, file)
 
           const { error: imgError } = await supabase
@@ -82,6 +83,11 @@ export default function ResultsPage({ params }: PageProps) {
     } finally {
       setUploading(false)
     }
+  }
+
+  async function handleRemove(imageId: string) {
+    await supabase.from('images').delete().eq('id', imageId)
+    setImages((prev) => prev.filter((i) => i.id !== imageId))
   }
 
   const doneCount = images.filter((i) => i.status === 'done').length
@@ -118,7 +124,7 @@ export default function ResultsPage({ params }: PageProps) {
         )}
       </div>
 
-      <ResultsGrid images={images} batchId={batchId} />
+      <ResultsGrid images={images} batchId={batchId} onRemove={handleRemove} />
 
       {images.length > 0 && (
         <div className="mt-8">
