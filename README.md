@@ -1,6 +1,6 @@
 # Batch Photo Editor
 
-Upload one photo, dial in your edits, lock it as a template, then upload more, edits apply automatically to every image in the batch.
+Upload one photo, dial in your edits, lock it in as a template, then upload more, edits apply automatically to every image in the batch.
 
 ## Motivation
 
